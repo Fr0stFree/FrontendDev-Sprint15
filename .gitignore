@@ -1,0 +1,14 @@
+.idea/
+.vscode/
+.DS_Store/
+
+../.env
+backend/package-lock.json
+
+logs
+*.log
+npm-debug.log*
+
+node_modules
+
+.npm
