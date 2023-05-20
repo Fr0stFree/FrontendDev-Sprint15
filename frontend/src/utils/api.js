@@ -1,7 +1,13 @@
+import config from '../config';
+
 class Api {
   constructor({baseUrl, headers}) {
     this._baseUrl = baseUrl;
     this._headers = headers;
+  }
+
+  set token(token) {
+    this._headers["authorization"] = `Bearer ${token}`;
   }
 
   getUserInfo() {
@@ -54,7 +60,7 @@ class Api {
   }
 
   likeCard(id) {
-    return fetch(`${this._baseUrl}/cards/likes/${id}`, {
+    return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: 'PUT',
       headers: this._headers
     })
@@ -62,7 +68,7 @@ class Api {
   }
 
   dislikeCard(id) {
-    return fetch(`${this._baseUrl}/cards/likes/${id}`, {
+    return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: 'DELETE',
       headers: this._headers
     })
@@ -79,9 +85,8 @@ class Api {
 }
 
 export default new Api({
-  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-58',
+  baseUrl: config.BACKEND_URL,
   headers: {
     "Content-Type": "application/json",
-    "authorization": "8a10ae20-3876-4243-a54a-b307b1f8ac17"
   }
 })

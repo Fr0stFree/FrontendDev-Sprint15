@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 
-import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 import defaultAvatarPath from '../images/Jack-Iv-Kusto.svg';
-import api from '../utils/api.js';
 import Header from './Header.js';
 import Main from "./Main.js";
 import Footer from "./Footer.js";
@@ -14,8 +12,11 @@ import EditAvatarPopup from "./EditAvatarPopup.js";
 import AddPlacePopup from "./AddPlacePopup.js";
 import Register from "./Register.js";
 import Login from "./Login.js";
+import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 import ProtectedRoute from "./ProtectedRoute.js";
 import authApi from "../utils/authApi";
+import api from '../utils/api.js';
+import InfoTooltip from "./InfoTooltip";
 
 
 export default class App extends Component {
@@ -29,6 +30,8 @@ export default class App extends Component {
       isEditAvatarPopupOpen: false,
       isAddPlacePopupOpen: false,
       isDeletePlacePopupOpen: false,
+      isInfoTooltipOpen: false,
+      tooltipOpenedOnFail: false,
       selectedCard: undefined,
     }
 
@@ -37,19 +40,48 @@ export default class App extends Component {
     this.handleUpdateUser = this.handleUpdateUser.bind(this);
     this.handleUpdateAvatar = this.handleUpdateAvatar.bind(this);
     this.handleAddPlace = this.handleAddPlace.bind(this);
-    this.authenticate = this.authenticate.bind(this);
+    this.handleRegistration = this.handleRegistration.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+    this.handleAuthentication = this.handleAuthentication.bind(this);
   }
 
-  async componentDidMount() {
-    const token = localStorage.getItem('token');
-    if (token) {
-      await this.authenticate(token);
+  async componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.state.isAuthenticated !== prevState.isAuthenticated) {
+      await this.handleAuthentication();
     }
   }
 
-  async authenticate(token) {
+  async componentDidMount() {
+    await this.handleAuthentication()
+  }
+
+  async handleRegistration(password, email) {
     try {
-      const {data: {email}} = await authApi.verifyToken(token);
+      await authApi.register(password, email);
+      this.setState({isInfoTooltipOpen: true, tooltipOpenedOnFail: false});
+    } catch (error) {
+      this.setState({isInfoTooltipOpen: true, tooltipOpenedOnFail: true});
+    }
+  }
+
+  async handleLogin(password, email) {
+    try {
+      const response = await authApi.login(password, email);
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+        this.setState({isAuthenticated: true})
+      }
+    } catch (error) {
+      this.setState({isInfoTooltipOpen: true, tooltipOpenedOnFail: true});
+    }
+  }
+
+  async handleAuthentication() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const { email } = await authApi.verifyToken(token);
+      api.token = token;
       this.setState({isAuthenticated: true});
       const [currentUser, cards] = await Promise.all([
         api.getUserInfo(), api.getInitialCards()
@@ -57,8 +89,14 @@ export default class App extends Component {
       currentUser.email = email;
       this.setState({currentUser, cards});
     } catch (error) {
-      console.error(error);
+      console.log(error)
+      this.setState({isInfoTooltipOpen: true, tooltipOpenedOnFail: true});
     }
+  }
+
+  handleSignOut = () => {
+    localStorage.removeItem('token');
+    this.setState({isAuthenticated: false});
   }
 
   handleEditProfileClick = () => this.setState({ isEditProfilePopupOpen: true })
@@ -129,6 +167,7 @@ export default class App extends Component {
       isEditAvatarPopupOpen: false,
       isAddPlacePopupOpen: false,
       isDeletePlacePopupOpen: false,
+      isInfoTooltipOpen: false,
       selectedCard: undefined,
     });
   }
@@ -137,10 +176,12 @@ export default class App extends Component {
     return (
       <div className="page">
         <CurrentUserContext.Provider value={this.state.currentUser}>
-          <Header isAuthenticated={this.state.isAuthenticated} />
+          <Header isAuthenticated={this.state.isAuthenticated} onSignOut={this.handleSignOut} />
           <Routes>
-            <Route path="/sign-up" element={this.state.isAuthenticated ? <Navigate to="/" /> : <Register />} />
-            <Route path="/sign-in" element={this.state.isAuthenticated ? <Navigate to="/" /> : <Login onAuthentication={this.authenticate} />} />
+            <Route path="/sign-up" element={this.state.isAuthenticated ? <Navigate to="/" />
+                                                                       : <Register onSubmit={this.handleRegistration} />} />
+            <Route path="/sign-in" element={this.state.isAuthenticated ? <Navigate to="/" />
+                                                                       : <Login onSubmit={this.handleLogin} />} />
             <Route path="/" element={<ProtectedRoute component={Main}
                                                      onEditProfile={this.handleEditProfileClick}
                                                      onAddPlace={this.handleAddPlaceClick}
@@ -149,7 +190,7 @@ export default class App extends Component {
                                                      onCardClick={this.handleCardClick}
                                                      onCardDeleteClick={this.handleCardDeleteClick}
                                                      onCardLikeClick={this.handleCardLikeClick}
-                                                     onEditAvatar={this.handleEditAvatarClick} />} />} />
+                                                     onEditAvatar={this.handleEditAvatarClick} />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           <Footer />
@@ -169,6 +210,9 @@ export default class App extends Component {
                          isOpen={this.state.isAddPlacePopupOpen} />
           <ImagePopup onClose={this.closeAllPopups}
                       card={this.state.selectedCard} />
+          <InfoTooltip onClose={this.closeAllPopups}
+                       hasFailed={this.state.tooltipOpenedOnFail}
+                       isOpen={this.state.isInfoTooltipOpen} />
         </CurrentUserContext.Provider>
       </div>
     );

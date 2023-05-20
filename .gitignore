@@ -2,13 +2,16 @@
 .vscode/
 .DS_Store/
 
-../.env
+.env
 backend/package-lock.json
+build/
 
-logs
+logs/
 *.log
 npm-debug.log*
 
 node_modules
 
 .npm
+
+.env

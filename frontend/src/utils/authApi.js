@@ -1,3 +1,5 @@
+import config from "../config";
+
 class AuthApi {
   constructor({baseUrl, headers}) {
     this._baseUrl = baseUrl;
@@ -5,44 +7,32 @@ class AuthApi {
   }
 
   async register(password, email) {
-    try {
-      const response = await fetch(`${this._baseUrl}/signup`, {
-        method: 'POST',
-        headers: this._headers,
-        body: JSON.stringify({password, email})
-      });
-      return await this._checkResponse(response);
-    } catch (e) {
-      return Promise.reject(e);
-    }
+    const response = await fetch(`${this._baseUrl}/signup`, {
+      method: 'POST',
+      headers: this._headers,
+      body: JSON.stringify({password, email})
+    });
+    return await this._checkResponse(response);
   }
 
   async login(password, email) {
-    try {
-      const response = await fetch(`${this._baseUrl}/signin`, {
-        method: 'POST',
-        headers: this._headers,
-        body: JSON.stringify({password, email})
-      });
-      return await this._checkResponse(response);
-    } catch (e) {
-      return Promise.reject(e);
-    }
+    const response = await fetch(`${this._baseUrl}/signin`, {
+      method: 'POST',
+      headers: this._headers,
+      body: JSON.stringify({password, email})
+    });
+    return await this._checkResponse(response);
   }
 
   async verifyToken(token) {
-    try {
-      const response = await fetch(`${this._baseUrl}/users/me`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      return await this._checkResponse(response);
-    } catch (e) {
-      return Promise.reject(e);
-    }
+    const response = await fetch(`${this._baseUrl}/users/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return await this._checkResponse(response);
   }
 
   async _checkResponse(res) {
@@ -55,7 +45,7 @@ class AuthApi {
 }
 
 export default new AuthApi({
-  baseUrl: 'https://auth.nomoreparties.co',
+  baseUrl: config.BACKEND_URL,
   headers: {
     "Content-Type": "application/json",
   }
