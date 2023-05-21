@@ -78,15 +78,17 @@ export default class App extends Component {
 
   async handleAuthentication() {
     const token = localStorage.getItem('token');
+    console.log(token);
     if (!token) return;
     try {
-      const { email } = await authApi.verifyToken(token);
+      const response = await authApi.verifyToken(token);
+      console.log(response);
       api.token = token;
       this.setState({isAuthenticated: true});
       const [currentUser, cards] = await Promise.all([
         api.getUserInfo(), api.getInitialCards()
       ])
-      currentUser.email = email;
+      currentUser.email = response.email;
       this.setState({currentUser, cards});
     } catch (error) {
       console.log(error)
