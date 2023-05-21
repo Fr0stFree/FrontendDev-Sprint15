@@ -14,3 +14,7 @@ Frontend https://boss.of.this.gym.nomoredomains.monster/
 Backend https://api.boss.of.this.gym.nomoredomains.monster/
 
 [![Tests](https://github.com/Fr0stFree/Website-Mesto/actions/workflows/tests.yml/badge.svg)](https://github.com/Fr0stFree/Website-Mesto/actions/workflows/tests.yml)
+
+```shell
+scp -r ./build/* frostfree@130.193.36.150:/home/frostfree/Website-Mesto/frontend
+```

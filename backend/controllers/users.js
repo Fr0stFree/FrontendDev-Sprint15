@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const { ObjectAlreadyExist, PermissionDenied } = require('../core/errors');
 const { User } = require('../models');
 const { SECRET_KEY, TOKEN_EXPIRATION } = require('../config');
 const { getUser } = require('../core/utils');
@@ -54,6 +55,9 @@ const create = async (req, res, next) => {
     user.password = undefined;
     return res.status(httpStatus.CREATED).send(user);
   } catch (err) {
+    if (err.name === 'MongoServerError' && err.code === 11000) {
+      return next(new ObjectAlreadyExist(`Email "${email}" is already taken. Choose another.`));
+    }
     return next(err);
   }
 };
