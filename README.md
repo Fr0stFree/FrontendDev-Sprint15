@@ -13,4 +13,4 @@ Frontend https://boss.of.this.gym.nomoredomains.monster/
 
 Backend https://api.boss.of.this.gym.nomoredomains.monster/
 
-[![Tests](https://github.com/yandex-praktikum/react-mesto-api-full-gha/actions/workflows/tests.yml/badge.svg)](https://github.com/yandex-praktikum/react-mesto-api-full-gha/actions/workflows/tests.yml)
+[![Tests](https://github.com/Fr0stFree/Website-Mesto/actions/workflows/tests.yml/badge.svg)](https://github.com/Fr0stFree/Website-Mesto/actions/workflows/tests.yml)
