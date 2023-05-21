@@ -7,7 +7,8 @@ const { PermissionDenied } = require('../core/errors');
 const create = async (req, res, next) => {
   const { name, link } = req.body;
   try {
-    const card = await Card.create({ name, link, owner: req.user.userId });
+    const { _id } = await Card.create({ name, link, owner: req.user.userId });
+    const card = await Card.findById(_id).populate(['owner', 'likes']);
     return await res.status(httpStatus.CREATED).send(card);
   } catch (err) {
     return next(err);

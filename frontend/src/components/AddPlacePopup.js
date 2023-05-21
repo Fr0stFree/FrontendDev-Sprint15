@@ -18,6 +18,7 @@ export default class AddPlacePopup extends Component {
     event.preventDefault();
     const {place, link} = this.state;
     this.props.onAddPlace(place, link);
+    this.setState({place: '', link: ''})
   }
 
   render() {
