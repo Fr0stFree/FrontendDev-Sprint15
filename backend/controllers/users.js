@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { ObjectAlreadyExist, PermissionDenied } = require('../core/errors');
+const { ObjectAlreadyExist } = require('../core/errors');
 const { User } = require('../models');
 const { SECRET_KEY, TOKEN_EXPIRATION } = require('../config');
 const { getUser } = require('../core/utils');
