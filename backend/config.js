@@ -5,7 +5,7 @@ const BASE_DIR = path.join(__dirname, '');
 require('dotenv').config({ path: path.join(BASE_DIR, '../.env') });
 
 module.exports = {
-  BASE_DIR: BASE_DIR,
+  BASE_DIR,
   TOKEN_EXPIRATION: '7d',
   NODE_ENV: process.env.NODE_ENV || 'dev',
   SECRET_KEY: process.env.SECRET_KEY || 'SOMETHING-REALLY-SECRET',
